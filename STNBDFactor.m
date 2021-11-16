@@ -1,7 +1,7 @@
 function A = STNBDFactor(B,C,i)
 
-% if A=L1 L2 ... D U_{n-1} ... U_1 this code extracts D for i=0
-% extracts L_{n-1} for i=-1, L_{n-2} for i=-2, D_{n-1} for i=1, etc.
+% if A=L_(n-1)... L_1 D U_1 ... U_(n-1) this code extracts D for i=0
+% extracts L_(n-1) for i=-(n-1), L_{n-2} for i=-(n-2), D for i=0, U_1 for i=1 etc.
 
 if i==0
     A=diag(diag(B));
