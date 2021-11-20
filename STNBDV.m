@@ -24,7 +24,7 @@ end
 % second loop: m~_ij
 for i=0:n
     for j=0:i-1
-       M(j+1,i+1)=1;
+        M(j+1,i+1)=x(j+1);
     end
 end
 % third loop: the diagonal entries p_ii
