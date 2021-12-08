@@ -1,0 +1,67 @@
+%function [M,C] = STNBDHBV(h,x)
+%computes the BD of a potentially singular HBV matrix
+function [M,C] = STNBDHBV(h,x);
+n = length(x)-1;
+M = zeros(n+1);
+C=ones(n+1);
+if class(x) == 'sym'
+M = sym(M);
+C=sym(C);
+end
+%m_i,j computation:
+for i = 2:n+1
+aux = (1-x(i))/(1-x(i-1));
+for k = 1:n-1
+aux = aux*((1-x(i))+k*h)/((1-x(i-1))+k*h);
+end
+M(i,1)=aux;
+end
+for i = 3:n+1
+M(i,2)=((1-x(i-2))+(n-1)*h)/(((1-x(i))+(n-1)*h))*M(i,1);
+end
+for j = 2:n-1
+for i = j+2:n+1
+M(i,j+1)=((1-x(i-j-1))+(n-j)*h)*((1-x(i-1))+(n-j+1)*h)/(((1-x(i))+(n-j)*h)*((1-x(i-j))+(n-j+1)*h))*M(i,j);
+end
+end
+for i=2:n+1
+for j=1:i-2
+C(i,j+1)=x(i-1)-x(i-j-1);
+end
+end
+%m~_i,j computation:
+for j = 2:n+1
+M(1,j)=(n-j+2)*(x(1)+(j-2)*h)/((j-1)*((1-x(1))+(n-j+1)*h));
+end
+for j = 3:n+1
+for i = 1:j-2
+M(i+1,j) = (x(i+1)+(j-i-2)*h)*((1-x(i))+(n-j+2)*h)/((x(i)+(j-i-1)*h)*((1-x(i+1))+(n-j+1)*h))*M(i,j);
+end
+end
+%p_i,i computation:
+aux = 1;
+for k=1:n
+aux=aux/(1-x(k));
+end
+M(n+1,n+1)=aux;
+B=zeros(1,n+1);
+if class(x) == 'sym'
+B = sym(B);
+end
+B(1) = 1;
+for i=1:n
+B(i+1)=(n-i+1)/i*B(i);
+end
+for i=1:n
+aux=B(i)*(1-x(i));
+for k=1:i-1
+aux=aux/((1-x(k))+(n-i+1)*h);
+end
+for k=1:n-i
+aux=aux*(1-x(i)+k*h)/(1+k*h);
+end
+M(i,i)=aux;
+end
+for i=2:n+1
+M(n+1,i)=M(n+1,i)*prod(x(n+1)-x(n-i+2:n));
+end
