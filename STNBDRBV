@@ -1,0 +1,61 @@
+function [M,C] = STNBDRBV(w,c)
+
+[m1,n1]=size(w);
+[m2,n2]=size(c);
+
+if n1~=n2
+	disp('weights vector w and nodes vector c has not compatible dimensions');
+	return;
+end
+
+n=n1-1;
+
+M=zeros(n1);
+C=ones(n1);
+
+if class(x) == 'sym'
+    M=sym(M);
+    C=sym(C);
+end
+
+% computing W(t_i)
+for i=1:n+1
+	coef(i)=w(i)*nchoosek(n,i-1);
+end
+W=VS(coef,c);
+
+% first loop: m_ij
+for i=2:n+1
+    auxM=(W(i-1)/W(i))*(1-c(i))^n/(1-c(i-1))^(n+1);
+    M(i,1)=(1-c(i-1))*auxM;
+    for j=1:i-2
+        auxM=auxM*(1-c(i-1))/(1-c(i));
+        M(i,j+1)=(1-c(i-j-1))*auxM;
+    end
+end
+
+for i=2:n+1
+    for j=1:i-2
+        C(i,j+1)=c(i-1)-c(i-j-1);
+    end
+end
+
+% second loop: m~_ij
+for j=1:n
+    cj=c(j)/(1-c(j));    
+    for i=j+1:n+1
+        M(j,i)=(w(i)/w(i-1))*cj*(n-i+2)/(i-1);
+    end
+end
+
+% third loop: the diagonal entries p_ii
+q=1;
+M(1,1)=(w(1)/W(1))*(1-c(1))^n;
+for i=1:n
+    q=((n-i+1)/i)*(1/(1-c(i)))*q;
+    M(i+1,i+1)=(w(i+1)/W(i+1))*q*(1-c(i+1))^(n-i);
+end
+
+for i=2:n+1
+    M(n+1,i)=M(n+1,i)*prod(c(n+1)-c(n-i+2:n));
+end
